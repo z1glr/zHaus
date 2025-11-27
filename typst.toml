@@ -1,11 +1,16 @@
 [package]
-name = "luzid-checkbox"
+name = "zHaus"
 version = "0.1.0"
 entrypoint = "luzid-checkbox.typ"
 authors = ["z1glr"]
 license = "GPL-3.0-or-later"
-description = "Write checklists in a markdown syntax and use icons like many Obsidian themes."
-repository = "https://github.com/z1glr/luzid-checkbox"
-keywords = ["list", "icon", "checkbox"]
-categories = ["components", "visualization", "text"]
+description = "Bauhaus inspired quick documents and notes."
+repository = "https://github.com/z1glr/zHaus"
+keywords = ["template", "bauhaus"]
+categories = ["components", "report", "office"]
 exclude = ["/example/*", "/test/*"]
+
+[template]
+path = "template"
+entrypoint = "main.typ"
+thumbnail = "thumbnail.png"

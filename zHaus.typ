@@ -44,10 +44,10 @@
     table-caption-position = z.parse(table-caption-position, z.alignment(default: top))
     figure-caption-position = z.parse(figure-caption-position, z.alignment(default: bottom))
     keywords = z.parse(keywords, z.array(z.string()))
-    fonts = z.parse(fonts, z.dictionary((heading: z.string(default: "Lexend"), text: z.string(default: "Literata"))))
+    fonts = z.parse(fonts, z.dictionary((heading: z.string(default: "Lexend"), text: z.string(default: "Vollkorn"))))
     watermark = z.parse(watermark, z.string(optional: true))
     papersize = z.parse(papersize, z.schemas.papersize(default: "a4"))
-    page-numbering = z.parse(page-numbering, z.string(optional: true))
+    page-numbering = z.parse(page-numbering, z.string(default: "1"))
     cols = z.parse(cols, z.integer(default: 1))
     lang = z.parse(lang, z.string(default: "de"))
     region = z.parse(region, z.string(default: "de"))
@@ -114,6 +114,16 @@
         keywords: if keywords != none { keywords } else { none },
     )
 
+    // Text defaults
+    set text(
+        lang: lang,
+        region: region,
+        font: fonts.text,
+        size: fontsize,
+
+        spacing: 90%,
+    )
+
     // setup the page
     set page(
         paper: papersize,
@@ -152,18 +162,8 @@
                 author.join(", ")
             }
             h(1fr)
-            counter(page).display("1")
+            counter(page).display(page-numbering)
         },
-    )
-
-    // Text defaults
-    set text(
-        lang: lang,
-        region: region,
-        font: fonts.text,
-        size: fontsize,
-
-        spacing: 90%,
     )
 
     // Block quotations
@@ -251,6 +251,7 @@
 
     if titlepage {
         context [
+            // get the colors from the palette
             #let color1 = palette.red
             #let color2 = palette.yellow
             #let color3 = palette.blue
@@ -261,8 +262,11 @@
             #let height = page.height
             #let width = page.width
 
+            #let margin = 5mm
+
             #set text(size: 1em * page-size-scale(page))
 
+            // setup the page independent of the others
             #set page(
                 background: rect(width: 100%, height: 100%, fill: background, stroke: none),
                 header: none,
@@ -271,6 +275,7 @@
                 columns: 1,
             )
 
+            // draw a quarter circle by masking a full one
             #let arc(radius: 20mm, pos: 0, color: white) = {
                 place(
                     dy: -radius,
@@ -298,6 +303,7 @@
                 )
             }
 
+            // draw a circle
             #let circ(radius: 20mm, color: white) = {
                 place(
                     dx: -radius,
@@ -306,44 +312,49 @@
                 )
             }
 
+            // top-left arc
             #place(
                 dx: 0mm,
                 dy: 0mm,
                 arc(radius: height / 2, pos: 2, color: color1),
             )
 
+            // bottom-left arc
             #place(
                 dx: width / 2,
                 dy: height / 2,
                 arc(radius: height / 2, pos: 3, color: color3),
             )
 
+            // bottom-right arc
             #place(
                 dx: width / 2,
                 dy: height / 2,
                 arc(radius: width / 2, pos: 2, color: color4),
             )
 
+            // middle arc
             #place(
                 dx: width / 2,
                 dy: height / 2,
                 arc(radius: (1 - calc.sin(45deg)) * height / 2, pos: 1, color: color2),
             )
 
+            // top-right circle
             #place(
                 dx: 13 / 16 * width,
                 dy: height / 4,
                 circ(radius: height / 16, color: color3),
             )
 
+            // bottom-circle
             #place(
                 dx: 19 / 32 * width,
                 dy: 29 / 32 * height,
                 circ(radius: height / 32, color: color1),
             )
 
-            #let margin = 5mm
-
+            // border
             #place(
                 dx: margin,
                 dy: margin,
@@ -354,6 +365,7 @@
                 ),
             )
 
+            // title and subtitle
             #place(
                 dx: 2 * margin,
                 dy: 4 * margin,
@@ -377,6 +389,7 @@
                 ]
             ]
 
+            // authors and date
             #place(
                 dx: 2 * margin,
                 dy: 2 * margin + height / 2,
@@ -400,6 +413,7 @@
                 ]
             ]
 
+            // tags
             #if tags != none {
                 place(
                     dx: 11 / 16 * width,
@@ -414,6 +428,7 @@
                 ]
             }
 
+            // abstract
             #if abstract != none {
                 place(
                     dx: width / 2,
@@ -434,6 +449,7 @@
         ]
     }
 
+    // table of content
     if toc {
         set page(columns: 1)
 
@@ -458,6 +474,7 @@
         fill: luma(247),
     )
 
+    // alternative checkboxes
     show: luzid.with(color-map: (
         task: palette.gray,
         done: palette.green,
