@@ -11,7 +11,8 @@
     table-caption-position: none, // alignment
     figure-caption-position: none, // alignment
     keywords: none, // array[string]
-    fonts: none, // dict: (heading: string, text: string)
+    font-heading: none,
+    font-text: none,
     watermark: none, // string
     papersize: none, // string
     page-numbering: none, // string
@@ -44,7 +45,8 @@
     table-caption-position = z.parse(table-caption-position, z.alignment(default: top))
     figure-caption-position = z.parse(figure-caption-position, z.alignment(default: bottom))
     keywords = z.parse(keywords, z.array(z.string()))
-    fonts = z.parse(fonts, z.dictionary((heading: z.string(default: "Lexend"), text: z.string(default: "Vollkorn"))))
+    font-heading = z.parse(font-heading, z.string(default: "Lexend"))
+    font-text = z.parse(font-text, z.string(default: "Vollkorn"))
     watermark = z.parse(watermark, z.string(optional: true))
     papersize = z.parse(papersize, z.schemas.papersize(default: "a4"))
     page-numbering = z.parse(page-numbering, z.string(default: "1"))
@@ -118,7 +120,7 @@
     set text(
         lang: lang,
         region: region,
-        font: fonts.text,
+        font: font-text,
         size: fontsize,
 
         spacing: 90%,
@@ -138,7 +140,7 @@
         foreground: if watermark != none {
             context (
                 rotate(-calc.atan(page.height / page.width))[
-                    #set text(font: fonts.heading, size: 120pt * page-size-scale(page), fill: black.transparentize(80%))
+                    #set text(font: font-heading, size: 120pt * page-size-scale(page), fill: black.transparentize(80%))
                     *#watermark*
                 ]
             )
@@ -216,7 +218,7 @@
     show footnote.entry: set text(size: 8pt, weight: 200)
 
     // HEADINGS
-    show heading: set text(font: fonts.heading)
+    show heading: set text(font: font-heading)
     show heading: set block(below: 2em)
     set heading(numbering: section-numbering)
 
@@ -375,7 +377,7 @@
 
                     #if title != none {
                         [
-                            #set text(font: fonts.heading, size: 3em, weight: "black")
+                            #set text(font: font-heading, size: 3em, weight: "black")
                             #title
                         ]
                     }
@@ -396,7 +398,7 @@
             )[
                 #block(width: width / 2 - 3 * margin)[
                     #set par(spacing: 0.5em)
-                    #set text(font: fonts.text, fill: white, size: 1.5em)
+                    #set text(font: font-text, fill: white, size: 1.5em)
                     #align(
                         right,
                         {
@@ -420,7 +422,7 @@
                     dy: 7 / 8 * height,
                 )[
                     #block(width: width - 11 / 16 * width - 2 * margin, height: height / 16)[
-                        #set text(font: fonts.text, size: 2em)
+                        #set text(font: font-text, size: 2em)
                         #v(1fr)
                         #align(right, tags.map(tag => "#" + tag).join(h(0.5em)))
                         #v(1fr)
@@ -437,7 +439,7 @@
                     #block(width: width / 2 - margin)[
                         #pad(x: margin, top: 2 * margin, {
                             set par(spacing: 0.5em)
-                            set text(fill: silver, style: "italic", font: fonts.text, size: 1.5em)
+                            set text(fill: silver, style: "italic", font: font-text, size: 1.5em)
 
                             abstract
                         })

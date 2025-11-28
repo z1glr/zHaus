@@ -13,10 +13,8 @@
     figure-caption-position: bottom,
 
     // papersize: "a4",
-    // fonts: (
-    //     heading: "Lexend",
-    //     text: "Vollkorn",
-    // ),
+    // font-heading: "Lexend",
+    // font-text: "Vollkorn",
 
     keywords: ("template", "zHaus"),
 
