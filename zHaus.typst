@@ -1,0 +1,158 @@
+#import "@local/zHaus:0.1.0": zHaus
+
+#let horizontalrule = block(spacing: 4em)[#line(start: (10%, 0%), end: (90%, 0%), stroke: 0.5pt)]
+
+#show: zHaus.with(
+$if(title)$
+	title: [$title$],
+$endif$
+
+$if(subtitle)$
+    subtitle: [$subtitle$],
+$endif$
+
+$if(author)$
+    author: ($if(author.name)$
+		"$author.name$",
+	$else$
+		"$author$",
+	$endif$),
+$endif$
+
+$if(date)$
+    date: "$date$",
+$endif$
+
+$if(tags)$
+    tags: ($for(tags)$[$tags$],$endfor$), 
+$endif$
+
+$if(abstract)$
+	abstract: "$abstract$",
+$endif$
+
+$if(toc)$
+    toc: $toc$,
+$endif$
+
+$if(toc-own-page)$
+    toc-own-page: $toc-own-page$,
+$endif$
+
+    table-caption-position: $if(table-caption-position)$$table-caption-position$$else$top$endif$,
+    figure-caption-position: $if(figure-caption-position)$$figure-caption-position$$else$bottom$endif$,
+
+  	cols: $if(columns)$$columns$$else$1$endif$,
+
+$if(keywords)$
+    keywords: ($for(keywords)$"$keywords$",$endfor$),
+$endif$
+
+$if(font-heading)$
+fonts: "$font-heading$",
+$endif$
+
+$if(font-text)$
+fonts: "$font-text$",
+$endif$
+
+$if(watermark)$
+    watermark: [$watermark$],
+$endif$
+
+    papersize: "$if(papersize)$$papersize$$else$a4$endif$",
+
+$if(titlepage)$
+    titlepage: $titlepage$,
+$endif$
+
+	page-numbering: $if(page-numbering)$"$page-numbering$"$else$none$endif$,
+
+$if(margin)$
+	margin: ($for(margin/pairs)$$margin.key$: $margin.value$,$endfor$),
+$endif$
+
+$if(lang)$
+	lang: "$lang$",
+$endif$
+
+$if(region)$
+	region: "$region$",
+$endif$
+
+$if(fontsize)$
+	fontsize: $fontsize$,
+$endif$
+
+    colorlinks: $if(colorlinks)$$colorlinks$$else$false$endif$,
+
+$if(section-numbering)$
+	section-numbering: "$section-numbering$",
+$endif$
+
+$if(toc-depth)$
+    toc-depth: $toc-depth$,
+$endif$
+
+    // citations: false,
+    // nocite-ids: none,
+    // csl: none,
+    // bibliographystyle: none,
+    // bibliography: none,
+    // full-bibliography: none,
+)
+
+#show cite: it => context {
+  if query(it.key).len() == 0 {
+    "@" + str(it.key)
+  } else {
+    it
+  }
+}
+
+#show image: it => {
+  figure(
+    it,
+    caption: it.alt,
+  )
+}
+
+$for(header-includes)$
+$header-includes$
+
+$endfor$
+
+$if(thanks)$
+	thanks: [$thanks$],
+$endif$
+$if(linestretch)$
+  linestretch: $linestretch$,
+$endif$
+
+$for(include-before)$
+$include-before$
+
+$endfor$
+
+$body$
+
+$if(citations)$
+$for(nocite-ids)$
+#cite(label("${it}"), form: none)
+$endfor$
+$if(csl)$
+
+#set bibliography(style: "$csl$")
+$elseif(bibliographystyle)$
+
+#set bibliography(style: "$bibliographystyle$")
+$endif$
+$if(bibliography)$
+
+#bibliography($for(bibliography)$"$bibliography$"$sep$,$endfor$$if(full-bibliography)$, full: true$endif$)
+$endif$
+$endif$
+$for(include-after)$
+
+$include-after$
+$endfor$

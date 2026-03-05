@@ -54,15 +54,15 @@ Only the boxes specified get overwritten, the rest stays at the default values:
 #import "@preview/luzid-checkbox:0.1.0": luzid
 
 #show: luzid.with(
-	color-map: (
-		task: rgb("#0000ff"),
-	),
-	marker-map: (
-		done: "icons/pin.svg", // path to a different icon
-	),
-	style-map: (
-		important: it => text(weight: "bold")[#it], // wrapping function
-	),
+ color-map: (
+  task: rgb("#0000ff"),
+ ),
+ marker-map: (
+  done: "icons/pin.svg", // path to a different icon
+ ),
+ style-map: (
+  important: it => text(weight: "bold")[#it], // wrapping function
+ ),
 )
 
 - [ ] Icon color
