@@ -27,7 +27,7 @@
   body,
 ) = {
   import "@preview/zebraw:0.6.1": *
-  import "@local/luzid-checkbox:0.2.0": luzid // TODO: change to @preview
+  import "@preview/luzid-checkbox:0.2.0": luzid
 
   import "@preview/valkyrie:0.2.2" as z
 
