@@ -28,6 +28,7 @@
 ) = {
   import "@preview/zebraw:0.6.1": *
   import "@preview/luzid-checkbox:0.2.0": luzid
+  import "@preview/calloutly:1.1.0"
 
   import "@preview/valkyrie:0.2.2" as z
 
@@ -68,6 +69,8 @@
       content-to-string(content.body)
     } else if content == [ ] {
       " "
+    } else if content == parbreak() {
+      "\n"
     }
   }
 
@@ -84,6 +87,11 @@
       ])
       .join()
   }
+
+  // grid-gutter
+  set grid(
+    gutter: 0.5em,
+  )
 
   // tables without stroke
   set table(
@@ -166,14 +174,126 @@
   )
 
   // Block quotations
-  show quote: set text(luma(119))
   set quote(quotes: false)
-  show quote: body => {
-    box(stroke: (left: 3pt + luma(221)))[
-      #v(0.5em)
-      #pad(left: 0.5em, body)
-      #v(0.5em)
-    ]
+  show: calloutly.callout-style.with(style: "quarto")
+  show quote: it => {
+    let start = content-to-string(it)
+
+    let match = start.match(regex(`^\s+\[!(\w+)](?:(?: (.+))\n?|\n?)`.text))
+
+    let types = (
+      "NOTE": (
+        type: "note",
+        title: "Note",
+        color: "#8839ef",
+        icon: "icons/lucide/pencil.svg",
+      ),
+      "ABSTRACT": (
+        type: "note",
+        title: "Abstract",
+        color: "#1e66f5",
+        icon: "icons/lucide/clipboard-list.svg",
+      ),
+      "INFO": (
+        type: "note",
+        title: "Info",
+        color: "#179299",
+        icon: "icons/lucide/info.svg",
+      ),
+      "TODO": (
+        type: "note",
+        title: "Todo",
+        color: "#179299",
+        icon: "icons/lucide/circle-check.svg",
+      ),
+      "TIP": (
+        type: "note",
+        title: "Tip",
+        color: "#179299",
+        icon: "icons/lucide/flame.svg",
+      ),
+      "SUCCESS": (
+        type: "note",
+        title: "Success",
+        color: "#40a02b",
+        icon: "icons/lucide/check.svg",
+      ),
+      "QUESTION": (
+        type: "note",
+        title: "Question",
+        color: "#40a02b",
+        icon: "icons/lucide/circle-question-mark.svg",
+      ),
+      "WARNING": (
+        type: "note",
+        title: "Question",
+        color: "#df8e1d",
+        icon: "icons/lucide/triangle-alert.svg",
+      ),
+      "FAILURE": (
+        type: "note",
+        title: "Failure",
+        color: "#e64553",
+        icon: "icons/lucide/x.svg",
+      ),
+      "DANGER": (
+        type: "note",
+        title: "Danger",
+        color: "#d20f39",
+        icon: "icons/lucide/zap.svg",
+      ),
+      "BUG": (
+        type: "note",
+        title: "Bug",
+        color: "#d20f39",
+        icon: "icons/lucide/bug.svg",
+      ),
+      "EXAMPLE": (
+        type: "note",
+        title: "Example",
+        color: "#8839ef",
+        icon: "icons/lucide/list.svg",
+      ),
+      "QUOTE": (
+        type: "note",
+        title: "Quote",
+        color: "#acb0be",
+        icon: "icons/lucide/quote.svg",
+      ),
+    )
+
+    if match != none and types.keys().contains(match.captures.at(0)) {
+      show figure: set block(below: 0em)
+
+      let args = types.at(match.captures.at(0))
+      args.icon = image(bytes(read(args.icon).replace("currentColor", args.color)), height: 1em)
+      args.color = color.rgb(args.color)
+
+      if match.captures.at(1) != none and match.captures.at(1) != "" {
+        args.title = match.captures.at(1)
+      }
+
+      let reached-content = false
+      let body = for pp in it.body.children {
+        if reached-content {
+          pp
+        }
+
+        if pp == parbreak() {
+          reached-content = true
+        }
+      }
+
+      calloutly.callout(..args, body)
+      v(1.5em)
+    } else {
+      set text(luma(119))
+      box(stroke: (left: 3pt + luma(221)))[
+        #v(0.5em)
+        #pad(left: 0.5em, it)
+        #v(0.5em)
+      ]
+    }
   }
 
   // unnumbered lists
@@ -185,7 +305,9 @@
   set enum(indent: 1em)
 
   // colorlinks
+  // TODO: add condition
   show link: set text(fill: rgb("#4077c0"))
+  show ref: it => text(fill: rgb("#4077c0"), emph(it))
 
   // images
   set image(fit: "contain")
@@ -207,8 +329,8 @@
     *#it.supplement~#it.counter.display()#it.separator*#text(fill: luma(119))[#it.body]
   ]
 
-  // Footnote formatting
-  show footnote: set text(fill: rgb("#a50000"))
+  // show footnote: set text(fill: rgb("#a50000"))
+  show footnote: set text(fill: color.black)
 
   set footnote.entry(indent: 1em)
   show footnote.entry: set par(spacing: 0.5em, justify: false, first-line-indent: 3em)
@@ -229,6 +351,13 @@
     hanging-indent: 2em,
     leading: 8pt,
   )
+
+  show link: it => {
+    it
+    footnote[
+      #it.dest
+    ]
+  }
 
   set par(justify: true)
 
